@@ -8,6 +8,7 @@ import com.springboot.blog.exception.ResourceNotFoundException;
 import com.springboot.blog.repository.CommentRepo;
 import com.springboot.blog.repository.PostRepo;
 import com.springboot.blog.service.CommentService;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +20,12 @@ public class CommentServiceImpl implements CommentService {
 
     private CommentRepo commentRepo;
     private PostRepo postRepo;
+    private ModelMapper modelMapper;
 
-    public CommentServiceImpl(CommentRepo commentRepo , PostRepo postRepo) {
+    public CommentServiceImpl(CommentRepo commentRepo , PostRepo postRepo, ModelMapper modelMapper) {
         this.commentRepo = commentRepo;
         this.postRepo = postRepo;
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -107,20 +110,22 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private CommentDto mapToDto(Comment comment){
-        CommentDto commentDto = new CommentDto();
-        commentDto.setId(comment.getId());
-        commentDto.setName(comment.getName());
-        commentDto.setEmail(comment.getEmail());
-        commentDto.setBody(comment.getBody());
+        CommentDto commentDto = modelMapper.map(comment, CommentDto.class);
+//        CommentDto commentDto = new CommentDto();
+//        commentDto.setId(comment.getId());
+//        commentDto.setName(comment.getName());
+//        commentDto.setEmail(comment.getEmail());
+//        commentDto.setBody(comment.getBody());
         return commentDto;
     }
 
     private Comment mapToComment(CommentDto commentDto){
-        Comment comment = new Comment();
-        comment.setId(commentDto.getId());
-        comment.setName(commentDto.getName());
-        comment.setEmail(commentDto.getEmail());
-        comment.setBody(commentDto.getBody());
+        Comment comment = modelMapper.map(commentDto, Comment.class);
+//        Comment comment = new Comment();
+//        comment.setId(commentDto.getId());
+//        comment.setName(commentDto.getName());
+//        comment.setEmail(commentDto.getEmail());
+//        comment.setBody(commentDto.getBody());
         return comment;
     }
 }
