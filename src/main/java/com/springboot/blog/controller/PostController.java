@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class PostController {
     @Autowired
     private PostService postService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(path = "/createPost")
     public ResponseEntity<PostDto> createPost(@Valid @RequestBody PostDto postDto){
         return  new ResponseEntity<>(postService.createPost(postDto), HttpStatus.CREATED);
@@ -39,6 +41,7 @@ public class PostController {
         return postService.getPostById(id);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(path = "/updatePost/{id}")
     public ResponseEntity<PostDto> updatePost(@Valid @RequestBody PostDto postDto, @PathVariable(name = "id") long id){
         PostDto postResponse = postService.updatePost(postDto, id);
@@ -46,6 +49,7 @@ public class PostController {
         return new ResponseEntity<>(postResponse, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(path = "/deletePostById/{id}")
     public ResponseEntity<String> deletePostById(@PathVariable(name = "id") long id){
 
