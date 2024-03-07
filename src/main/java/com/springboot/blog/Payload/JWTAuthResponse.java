@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginDto {
-    private String usernameOrEmail;
-    private String password;
+public class JWTAuthResponse {
+    private String accessToken;
+    private String tokenType = "Bearer";
 }

@@ -4,30 +4,34 @@ import com.springboot.blog.Payload.PostDto;
 import com.springboot.blog.Payload.PostResponse;
 import com.springboot.blog.service.PostService;
 import com.springboot.blog.utils.AppConstants;
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/posts")
 public class PostController {
 
-    @Autowired
     private PostService postService;
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping(path = "/createPost")
-    public ResponseEntity<PostDto> createPost(@Valid @RequestBody PostDto postDto){
-        return  new ResponseEntity<>(postService.createPost(postDto), HttpStatus.CREATED);
+    public PostController(PostService postService) {
+        this.postService = postService;
     }
 
-    @GetMapping(path = "/getAllPosts")
-    PostResponse getAllPosts(
+    // create blog post rest api
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping
+    public ResponseEntity<PostDto> createPost(@Valid @RequestBody PostDto postDto){
+        return new ResponseEntity<>(postService.createPost(postDto), HttpStatus.CREATED);
+    }
+
+    // get all posts rest api
+    @GetMapping
+    public PostResponse getAllPosts(
             @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
             @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
             @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
@@ -36,24 +40,29 @@ public class PostController {
         return postService.getAllPosts(pageNo, pageSize, sortBy, sortDir);
     }
 
-    @GetMapping(path = "/getPostById/{id}")
-    PostDto getPostById(@PathVariable(name = "id") long id){
-        return postService.getPostById(id);
+    // get post by id
+    @GetMapping("/{id}")
+    public ResponseEntity<PostDto> getPostById(@PathVariable(name = "id") long id){
+        return ResponseEntity.ok(postService.getPostById(id));
     }
 
+    // update post by id rest api
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping(path = "/updatePost/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<PostDto> updatePost(@Valid @RequestBody PostDto postDto, @PathVariable(name = "id") long id){
-        PostDto postResponse = postService.updatePost(postDto, id);
 
-        return new ResponseEntity<>(postResponse, HttpStatus.OK);
+       PostDto postResponse = postService.updatePost(postDto, id);
+
+       return new ResponseEntity<>(postResponse, HttpStatus.OK);
     }
 
+    // delete post rest api
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping(path = "/deletePostById/{id}")
-    public ResponseEntity<String> deletePostById(@PathVariable(name = "id") long id){
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deletePost(@PathVariable(name = "id") long id){
 
-        String message = postService.deletePostById(id);
-        return new ResponseEntity<>(message, HttpStatus.OK);
+        postService.deletePostById(id);
+
+        return new ResponseEntity<>("Post entity deleted successfully.", HttpStatus.OK);
     }
 }
